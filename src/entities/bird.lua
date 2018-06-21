@@ -1,6 +1,7 @@
 Bird = Class{}
 
-local g = 10
+local g = 20
+local jumpSpeed = 5
 
 function Bird:init()
     self.image = love.graphics.newImage('src/assets/sprites/bird.png')
@@ -13,6 +14,10 @@ end
 function Bird:update(dt)
     self.dy = self.dy + g * dt
     self.y = self.y + self.dy
+
+    if love.keyboard.wasPressed('space') then
+        self.dy = -jumpSpeed
+    end
 end
 
 function Bird:draw()
