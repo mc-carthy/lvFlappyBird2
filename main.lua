@@ -1,13 +1,16 @@
-require('src.utils.debug')
+-- require('src.utils.debug')
 Push = require('src.lib.push')
 Class = require('src.lib.class')
 require('src.entities.bird')
+require('src.entities.pipe')
 
 WINDOW_WIDTH = 1280
 WINDOW_HEIGHT = 720
 
 VIRTUAL_WIDTH = 512
 VIRTUAL_HEIGHT = 288
+
+GROUND_HEIGHT = 16
 
 local background = love.graphics.newImage('src/assets/sprites/background.png')
 local backgroundScroll = 0
@@ -16,11 +19,15 @@ local BACKGROUND_LOOP = 413
 
 local ground = love.graphics.newImage('src/assets/sprites/ground.png')
 local groundScroll = 0
-local GROUND_SPEED = 60
+GROUND_SPEED = 60
 
 local bird
+local pipes = {}
+local spawnTimer = 0
+local spawnPeriod = 2
 
 function love.load()
+    math.randomseed(os.time())
     love.graphics.setDefaultFilter('nearest', 'nearest')
 
     love.window.setTitle('Flappy Bird')
@@ -54,7 +61,23 @@ end
 function love.update(dt)
     backgroundScroll = (backgroundScroll + BACKGROUND_SPEED * dt) % BACKGROUND_LOOP
     groundScroll = (groundScroll + GROUND_SPEED * dt) % VIRTUAL_WIDTH
+    
+    spawnTimer = spawnTimer + dt
+    if spawnTimer > 2 then
+        table.insert(pipes, Pipe())
+        spawnTimer = 0
+    end
+    
+    for k, pipe in pairs(pipes) do
+        pipe:update(dt)
+        
+        if pipe.x < -pipe.width then
+            table.remove(pipes, k)
+        end
+    end
+    
     bird:update(dt)
+    
     love.keyboard.keysPressed = {}
 end
 
@@ -62,7 +85,12 @@ function love.draw()
     Push:start()
 
     love.graphics.draw(background, -backgroundScroll, 0)
-    love.graphics.draw(ground, -groundScroll, VIRTUAL_HEIGHT - 16)
+    
+    for _, pipe in pairs(pipes) do
+        pipe:draw()
+    end
+    
+    love.graphics.draw(ground, -groundScroll, VIRTUAL_HEIGHT - GROUND_HEIGHT)
 
     bird:draw()
     
