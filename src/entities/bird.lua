@@ -2,6 +2,7 @@ Bird = Class{}
 
 local g = 20
 local jumpSpeed = 5
+local collisionPadding = 3
 
 function Bird:init()
     self.image = love.graphics.newImage('src/assets/sprites/bird.png')
@@ -13,10 +14,10 @@ end
 
 function Bird:collides(other)
     if 
-        self.x > other.x + other.w or
-        self.x + self.w < other.x or
-        self.y > other.y + other.h or
-        self.y + self.h < other.y
+        self.x + collisionPadding > other.x + other.w or
+        self.x + self.w - collisionPadding < other.x or
+        self.y + collisionPadding > other.y + other.h or
+        self.y + self.h - collisionPadding < other.y
     then 
         return false
     end
