@@ -3,6 +3,7 @@ Push = require('src.lib.push')
 Class = require('src.lib.class')
 require('src.entities.bird')
 require('src.entities.pipe')
+require('src.entities.pipePair')
 
 WINDOW_WIDTH = 1280
 WINDOW_HEIGHT = 720
@@ -19,12 +20,13 @@ local BACKGROUND_LOOP = 413
 
 local ground = love.graphics.newImage('src/assets/sprites/ground.png')
 local groundScroll = 0
-GROUND_SPEED = 60
+GROUND_SPEED = 100
 
 local bird
-local pipes = {}
+local pipePairs = {}
 local spawnTimer = 0
 local spawnPeriod = 2
+local lastY = -PIPE_HEIGHT + math.random(80) + GROUND_HEIGHT
 
 function love.load()
     math.randomseed(os.time())
@@ -64,15 +66,23 @@ function love.update(dt)
     
     spawnTimer = spawnTimer + dt
     if spawnTimer > 2 then
-        table.insert(pipes, Pipe())
+        local y = math.max(
+            -PIPE_HEIGHT + GROUND_HEIGHT,
+            math.min(
+                lastY + math.random(-20, 20),
+                VIRTUAL_HEIGHT - (GROUND_HEIGHT + PIPE_HEIGHT)
+            )
+        )
+
+        table.insert(pipePairs, PipePair(y))
         spawnTimer = 0
     end
     
-    for k, pipe in pairs(pipes) do
-        pipe:update(dt)
+    for k, pipePair in pairs(pipePairs) do
+        pipePair:update(dt)
         
-        if pipe.x < -pipe.width then
-            table.remove(pipes, k)
+        if pipePair.x < -PIPE_WIDTH then
+            table.remove(pipePair, k)
         end
     end
     
@@ -86,8 +96,8 @@ function love.draw()
 
     love.graphics.draw(background, -backgroundScroll, 0)
     
-    for _, pipe in pairs(pipes) do
-        pipe:draw()
+    for _, pipePair in pairs(pipePairs) do
+        pipePair:draw()
     end
     
     love.graphics.draw(ground, -groundScroll, VIRTUAL_HEIGHT - GROUND_HEIGHT)

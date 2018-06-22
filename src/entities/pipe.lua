@@ -1,18 +1,25 @@
 Pipe = Class{}
 
+PIPE_HEIGHT = 288
+PIPE_WIDTH = 70
 local PIPE_IMAGE = love.graphics.newImage('src/assets/sprites/pipe.png')
 
-function Pipe:init()
-    self.width, self.height = PIPE_IMAGE:getDimensions()
+function Pipe:init(orientation, y)
     self.x = VIRTUAL_WIDTH
-    self.y = VIRTUAL_HEIGHT - (GROUND_HEIGHT + math.random(50, 100))
-    self.dy = 0
+    self.y = y
+    self.orientation = orientation
 end
 
 function Pipe:update(dt)
-    self.x = self.x - GROUND_SPEED * dt
 end
 
 function Pipe:draw()
-    love.graphics.draw(PIPE_IMAGE, self.x, self.y)
+    love.graphics.draw(
+        PIPE_IMAGE, 
+        self.x, 
+        (self.orientation == 'top' and self.y + PIPE_HEIGHT or self.y),
+        0,
+        1,
+        (self.orientation == 'top' and -1 or 1)
+    )
 end
