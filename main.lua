@@ -27,6 +27,7 @@ local pipePairs = {}
 local spawnTimer = 0
 local spawnPeriod = 2
 local lastY = -PIPE_HEIGHT + math.random(80) + GROUND_HEIGHT
+local scrolling = true
 
 function love.load()
     math.randomseed(os.time())
@@ -61,33 +62,41 @@ function love.keyboard.wasPressed(key)
 end
 
 function love.update(dt)
-    backgroundScroll = (backgroundScroll + BACKGROUND_SPEED * dt) % BACKGROUND_LOOP
-    groundScroll = (groundScroll + GROUND_SPEED * dt) % VIRTUAL_WIDTH
-    
-    spawnTimer = spawnTimer + dt
-    if spawnTimer > 2 then
-        local y = math.max(
-            -PIPE_HEIGHT + GROUND_HEIGHT,
-            math.min(
-                lastY + math.random(-20, 20),
-                VIRTUAL_HEIGHT - (GROUND_HEIGHT + PIPE_HEIGHT)
-            )
-        )
-
-        table.insert(pipePairs, PipePair(y))
-        spawnTimer = 0
-    end
-    
-    for k, pipePair in pairs(pipePairs) do
-        pipePair:update(dt)
+    if scrolling then
+        backgroundScroll = (backgroundScroll + BACKGROUND_SPEED * dt) % BACKGROUND_LOOP
+        groundScroll = (groundScroll + GROUND_SPEED * dt) % VIRTUAL_WIDTH
         
-        if pipePair.x < -PIPE_WIDTH then
-            table.remove(pipePair, k)
+        spawnTimer = spawnTimer + dt
+        if spawnTimer > 2 then
+            local y = math.max(
+                -PIPE_HEIGHT + GROUND_HEIGHT,
+                math.min(
+                    lastY + math.random(-20, 20),
+                    VIRTUAL_HEIGHT - (GROUND_HEIGHT + PIPE_HEIGHT)
+                )
+            )
+
+            table.insert(pipePairs, PipePair(y))
+            spawnTimer = 0
         end
+        
+        for k, pipePair in pairs(pipePairs) do
+            pipePair:update(dt)
+            
+            for _, pipe in pairs(pipePair.pipes) do
+                if bird:collides(pipe) then
+                    scrolling = false
+                end
+            end
+
+            if pipePair.x < -PIPE_WIDTH then
+                table.remove(pipePair, k)
+            end
+        end
+        
+        bird:update(dt)
     end
-    
-    bird:update(dt)
-    
+
     love.keyboard.keysPressed = {}
 end
 

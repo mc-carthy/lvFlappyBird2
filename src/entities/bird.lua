@@ -5,10 +5,23 @@ local jumpSpeed = 5
 
 function Bird:init()
     self.image = love.graphics.newImage('src/assets/sprites/bird.png')
-    self.width, self.height = self.image:getDimensions()
-    self.x = VIRTUAL_WIDTH / 2 - self.width / 2
-    self.y = VIRTUAL_HEIGHT / 2 - self.height / 2
+    self.w, self.h = self.image:getDimensions()
+    self.x = VIRTUAL_WIDTH / 2 - self.w / 2
+    self.y = VIRTUAL_HEIGHT / 2 - self.h / 2
     self.dy = 0
+end
+
+function Bird:collides(other)
+    if 
+        self.x > other.x + other.w or
+        self.x + self.w < other.x or
+        self.y > other.y + other.h or
+        self.y + self.h < other.y
+    then 
+        return false
+    end
+
+    return true
 end
 
 function Bird:update(dt)

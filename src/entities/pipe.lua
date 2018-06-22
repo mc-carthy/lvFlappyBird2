@@ -7,6 +7,7 @@ local PIPE_IMAGE = love.graphics.newImage('src/assets/sprites/pipe.png')
 function Pipe:init(orientation, y)
     self.x = VIRTUAL_WIDTH
     self.y = y
+    self.w, self.h = PIPE_WIDTH, PIPE_HEIGHT
     self.orientation = orientation
 end
 
