@@ -30,6 +30,7 @@ function PlayScreenState:update(dt)
         if not pipePair.scored then
             if pipePair.x + PIPE_WIDTH < self.bird.x then
                 self.score = self.score + 1
+                sounds.score:play()
                 pipePair.scored = true
             end
         end
@@ -48,12 +49,16 @@ function PlayScreenState:update(dt)
     for k, pipePair in pairs(self.pipePairs) do
         for _, pipe in pairs(pipePair.pipes) do
             if self.bird:collides(pipe) then
+                sounds.explosion:play()
+                sounds.hurt:play()
                 stateMachine:change('score', { score = self.score })
             end
         end
     end
 
     if self.bird.y > VIRTUAL_HEIGHT - GROUND_HEIGHT or self.bird.y < -self.bird.h then
+        sounds.explosion:play()
+        sounds.hurt:play()
         stateMachine:change('score', { score = self.score })
     end
     

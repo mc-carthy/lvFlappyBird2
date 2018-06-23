@@ -57,6 +57,16 @@ function love.load()
     }
     stateMachine:change('title')
 
+    sounds = {
+        ['jump'] = love.audio.newSource('src/assets/audio/jump.wav', 'static'),
+        ['explosion'] = love.audio.newSource('src/assets/audio/explosion.wav', 'static'),
+        ['hurt'] = love.audio.newSource('src/assets/audio/hurt.wav', 'static'),
+        ['score'] = love.audio.newSource('src/assets/audio/score.wav', 'static'),
+        ['music'] = love.audio.newSource('src/assets/audio/marios_way.mp3', 'static')
+    }
+    sounds.music:setLooping(true)
+    sounds.music:play()
+
     love.keyboard.keysPressed = {}
 end
 
