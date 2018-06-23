@@ -20,6 +20,7 @@ require('src.states.baseState')
 require('src.states.playScreenState')
 require('src.states.titleScreenState')
 require('src.states.scoreState')
+require('src.states.countdownState')
 
 
 local background = love.graphics.newImage('src/assets/sprites/background.png')
@@ -51,7 +52,8 @@ function love.load()
     stateMachine = StateMachine {
         ['title'] = function() return TitleScreenState() end,
         ['play'] = function() return PlayScreenState() end,
-        ['score'] = function() return ScoreState() end
+        ['score'] = function() return ScoreState() end,
+        ['countdown'] = function() return CountdownState() end
     }
     stateMachine:change('title')
 
