@@ -1,55 +1,71 @@
 PlayScreenState = Class{ __includes = BaseState }
 
-local bird
-local pipePairs = {}
-local spawnTimer = 0
 local spawnPeriod = 2
-local lastY = -PIPE_HEIGHT + math.random(80) + GROUND_HEIGHT
 
 function PlayScreenState:init()
-    bird = Bird()
+    self.bird = Bird()
+    self.pipePairs = {}
+    self.timer = 0
+    self.score = 0
+    self.lastY = -PIPE_HEIGHT + math.random(80) + GROUND_HEIGHT
 end
 
 function PlayScreenState:update(dt)
-    spawnTimer = spawnTimer + dt
-    if spawnTimer > 2 then
+    self.timer = self.timer + dt
+    if self.timer > 2 then
         local y = math.max(
             -PIPE_HEIGHT + GROUND_HEIGHT,
             math.min(
-                lastY + math.random(-20, 20),
+                self.lastY + math.random(-20, 20),
                 VIRTUAL_HEIGHT - (GROUND_HEIGHT + PIPE_HEIGHT)
             )
         )
 
-        table.insert(pipePairs, PipePair(y))
-        spawnTimer = 0
+        table.insert(self.pipePairs, PipePair(y))
+        self.timer = 0
     end
     
-    for k, pipePair in pairs(pipePairs) do
-        pipePair:update(dt)
-        
-        for _, pipe in pairs(pipePair.pipes) do
-            if bird:collides(pipe) then
-                stateMachine:change('title')
+    for k, pipePair in pairs(self.pipePairs) do
+
+        if not pipePair.scored then
+            if pipePair.x + PIPE_WIDTH < self.bird.x then
+                self.score = self.score + 1
+                pipePair.scored = true
             end
         end
 
-        if pipePair.x < -PIPE_WIDTH then
-            table.remove(pipePair, k)
+        pipePair:update(dt)
+    end
+
+    for k, pipePair in pairs(self.pipePairs) do
+        if pipePair.remove then
+            table.remove(self.pipePairs, k)
         end
     end
 
-    if bird.y > VIRTUAL_HEIGHT - GROUND_HEIGHT then
-        stateMachine:change('title')
+    self.bird:update(dt)
+
+    for k, pipePair in pairs(self.pipePairs) do
+        for _, pipe in pairs(pipePair.pipes) do
+            if self.bird:collides(pipe) then
+                stateMachine:change('score', { score = self.score })
+            end
+        end
+    end
+
+    if self.bird.y > VIRTUAL_HEIGHT - GROUND_HEIGHT or self.bird.y < -self.bird.h then
+        stateMachine:change('score', { score = self.score })
     end
     
-    bird:update(dt)
 end
 
 function PlayScreenState:draw()
-    for _, pipePair in pairs(pipePairs) do
+    for _, pipePair in pairs(self.pipePairs) do
         pipePair:draw()
     end
 
-    bird:draw()
+    love.graphics.setFont(flappyFont)
+    love.graphics.print('Score: ' .. tostring(self.score), 8, 8)
+
+    self.bird:draw()
 end
