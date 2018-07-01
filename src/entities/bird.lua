@@ -10,6 +10,7 @@ function Bird:init()
     self.x = VIRTUAL_WIDTH / 2 - self.w / 2
     self.y = VIRTUAL_HEIGHT / 2 - self.h / 2
     self.dy = 0
+    self.rot = 0
 end
 
 function Bird:collides(other)
@@ -28,6 +29,7 @@ end
 function Bird:update(dt)
     self.dy = self.dy + g * dt
     self.y = self.y + self.dy
+    self.rot = math.atan2(self.dy, GROUND_SPEED) * 10
 
     if love.keyboard.wasPressed('space') then
         self.dy = -jumpSpeed
@@ -37,5 +39,5 @@ function Bird:update(dt)
 end
 
 function Bird:draw()
-    love.graphics.draw(self.image, self.x, self.y)
+    love.graphics.draw(self.image, self.x + self.w / 2, self.y + self.h / 2, self.rot, 1, 1, self.w / 2, self.h / 2)
 end
